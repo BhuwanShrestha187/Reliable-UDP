@@ -1,0 +1,23 @@
+  ================Checking checksums====================
+  uLong crc_received;
+  recvfrom(s, &crc_received, sizeof(crc_received), 0, (struct sockaddr*)&client, &slen); 
+  printf("Checksum received by the server: %lu\n", crc_received); 
+  //Calculate the CRC of the received data
+  uLong crc_calculated = crc32(0L, Z_NULL, 0); 
+  crc_calculated = crc32(crc_calculated, (const Bytef*)file_buffer, fsize);
+  printf("Checksum calculated by the server: %lu\n", crc_calculated); 
+  // Compare checksums
+  if (crc_received == crc_calculated) {
+      printf("Checksum match, file integrity verified.\n");
+  }
+  else {
+      printf("Checksum mismatch, file corrupted.\n");
+  }
+
+Client Side Checksum: 
+ //==================== Sending CRC ================
+ uLong crc = crc32(0L, Z_NULL, 0); 
+ crc = crc32(crc, (const Bytef*)fileBuffer, fileSize); 
+ printf("CRC Checksum Generated: %lu\n", crc);
+ // Send CRC checksum to server
+ sendto(sockfd, &crc, sizeof(crc), 0, (const struct sockaddr*)&servaddr, sizeof(servaddr));
